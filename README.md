@@ -68,8 +68,7 @@ src/
 <pre style="background:#f4f4f4; padding:10px; border-radius:8px;">
 1. Configurar base de datos
 2. Ejecutar script SQL
-3. Configurar conexión JDBC
-4. Ejecutar el proyecto
+3. Ejecutar el proyecto
 </pre>
 
 <hr>
