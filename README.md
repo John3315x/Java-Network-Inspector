@@ -11,7 +11,7 @@ Sistema de monitoreo de red desarrollado en Java que permite descubrir dispositi
 <h2 style="color:#34495e;">Descripción</h2>
 
 <p>
-MiniSIEM simula el comportamiento básico de herramientas de análisis de red y SIEM. 
+Nanakusa-miniSIEM simula el comportamiento básico de herramientas de análisis de red y SIEM. 
 El sistema detecta dispositivos en LAN, registra su información y almacena los resultados en una base de datos para análisis posterior.
 </p>
 
