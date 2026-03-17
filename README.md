@@ -34,7 +34,7 @@ El sistema detecta dispositivos en LAN, registra su información y almacena los 
 <h2 style="color:#34495e;">Tecnologías</h2>
 
 <ul>
-<li>Java (JDBC, ExecutorService)</li>
+<li>Java (Maven, ExecutorService)</li>
 <li>MySQL / MariaDB</li>
 <li>SQL (diseño relacional)</li>
 <li>Redes (TCP/IP, ARP, puertos)</li>
