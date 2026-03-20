@@ -7,12 +7,16 @@ import com.minisiem.TaskIDs;
 
 public class Task {
 
-	private final int id;
-	private final TaskIDs type;
-	private final String code, title, description;
+	private int id;
+	private TaskIDs type;
+	private String code, title, description;
 	private TaskIDs status;
 	private LocalDateTime dateTime;
 
+	public Task() {
+		
+	}
+	
 	/**
 	 * Para recibir desde la BBDD
 	 * 
@@ -22,7 +26,6 @@ public class Task {
 	 * @param dateTime
 	 */
 	public Task(int id, TaskIDs type, String code, String title, String description, TaskIDs status, LocalDateTime dateTime) {
-		super();
 		this.id = id;
 		this.type = type;
 		this.code = code;
@@ -38,42 +41,51 @@ public class Task {
 	 * @param title
 	 */
 	public Task(TaskIDs type, String title) {
-
-		this.id = -1;// codigo de no indice
 		this.type = type;
 		this.code = "BT-" + UUID.randomUUID(); // default code
 		this.title = title;
-		this.description = "";
 		this.status = TaskIDs.RUNNING;
 		this.dateTime = LocalDateTime.now();
-	}
-
-	public LocalDateTime getDateTime() {
-		return dateTime;
-	}
-
-	public void setDateTime(LocalDateTime dateTime) {
-		this.dateTime = dateTime;
 	}
 
 	public int getId() {
 		return id;
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public TaskIDs getType() {
 		return type;
+	}
+
+	public void setType(TaskIDs type) {
+		this.type = type;
 	}
 
 	public String getCode() {
 		return code;
 	}
 
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	public String getTitle() {
 		return title;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public TaskIDs getStatus() {
@@ -82,6 +94,14 @@ public class Task {
 
 	public void setStatus(TaskIDs status) {
 		this.status = status;
+	}
+
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		this.dateTime = dateTime;
 	}
 
 	@Override

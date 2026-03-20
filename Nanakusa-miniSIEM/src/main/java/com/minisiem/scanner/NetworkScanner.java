@@ -18,6 +18,8 @@ import com.minisiem.model.Task;
 import com.minisiem.model.port.Port;
 import com.minisiem.model.port.TcpPort;
 import com.minisiem.model.port.UdpPort;
+import com.minisiem.repository.DeviceRepository;
+import com.minisiem.repository.PortRepository;
 
 /**
  * Clase que contiene metodos de escaneo de red de alto procesamiento, por lo
@@ -29,16 +31,21 @@ import com.minisiem.model.port.UdpPort;
 public class NetworkScanner {
 	private final PortScanner portScanner;
 	private final int threadPoolSize;
+	private DeviceRepository deviceRepository;
 
 	public NetworkScanner(PortScanner portScanner, int threadPoolSize) {
 		this.portScanner = portScanner;
 		this.threadPoolSize = threadPoolSize;
+		this.deviceRepository = new DeviceRepository();
 	}
 
-	public List<Device> performFullHostScan(String baseIp, int start, int end, int[] tcpPorts, int[] udpPorts) throws IOException {
+	public List<Device> performFullHostScan(String baseIp, int start, int end, int[] tcpPorts, int[] udpPorts)
+			throws IOException {
 		// Se crea una INDICACION de tarea en el miniSEAM
 		Task taskIndicator = new Task(TaskIDs.SUBTASK, "Perform Full Host Scan");
-		TaskManager.subTaskStarted(taskIndicator);
+		int task_id = TaskManager.subTaskStartedAndGetId(taskIndicator);
+
+		PortRepository portRepository = new PortRepository(task_id);
 
 		// Creamos un pool fijo de hilos para controlar concurrencia.
 		// Esto evita crear un hilo por cada IP (lo cual sería ineficiente).
@@ -65,6 +72,9 @@ public class NetworkScanner {
 					return null;
 				}
 
+				// Intenta guardarlo en la BD
+				// new DeviceRepository().
+
 				String hostname = address.getHostName();
 				String macAddress = HostDiscovery.getMacAddress(address);
 
@@ -81,7 +91,7 @@ public class NetworkScanner {
 					Callable<Port> portTask = () -> {
 
 						if (portScanner.isTcpPortOpen(ip, port)) {
-							return new TcpPort(ip, String.valueOf(port), "TCP", detector.detectTcpService(ip, port));
+							return new TcpPort(task_id, ip, String.valueOf(port), "TCP", detector.detectTcpService(ip, port));
 						}
 
 						return null;
@@ -95,7 +105,7 @@ public class NetworkScanner {
 					Callable<Port> portTask = () -> {
 
 						if (portScanner.isUdpPortOpen(ip, port)) {
-							return new UdpPort(ip, String.valueOf(port), "UDP", detector.detectUdpService(port));
+							return new UdpPort(task_id, ip, String.valueOf(port), "UDP", detector.detectUdpService(port));
 						}
 
 						return null;
@@ -114,6 +124,8 @@ public class NetworkScanner {
 						Port port = future.get();
 
 						if (port != null) {
+							// Aqui no se puede guardar el puerto en la BD porque no ha sido guardado el
+							// dispositivo aún
 							openPorts.add(port);
 						}
 
@@ -149,6 +161,14 @@ public class NetworkScanner {
 
 				if (device != null) {
 					devices.add(device);
+
+					// Guardar Device en BD
+					deviceRepository.create(device);
+
+					// Guardar Port en BD - Poco eficiente
+					for (Port port : device.getOpenPorts()) {
+						portRepository.create(port);
+					}
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				// Manejo básico de errores.
@@ -164,7 +184,10 @@ public class NetworkScanner {
 		// - UI
 
 		TaskManager.subTaskCompleted(taskIndicator);
-		return devices;
 
+		// Guardar los puertos en la BD
+
+		return devices;
 	}
+
 }

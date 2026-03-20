@@ -47,6 +47,8 @@ public class HostDiscovery {
 		// ====================================================================
 		ExecutorService executor = Executors.newFixedThreadPool(Kernel.networkThreadPoolSize);
 		List<Future<Device>> futures = new ArrayList<>();
+		
+		DeviceRepository deviceRepository = new DeviceRepository();
 
 		for (int i = start; i <= end; i++) {
 
@@ -86,7 +88,7 @@ public class HostDiscovery {
 				if (device != null) {
 
 					activeHosts.add(device);
-					new DeviceRepository().create(device); // Guardar en la BBDD
+					deviceRepository.create(device); // Guardar en la BBDD
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
@@ -100,7 +102,7 @@ public class HostDiscovery {
 	public static String getMacAddress(InetAddress address) {
 
 		try {
-			// 🔎 Detectar si es una IP local (de tu máquina)
+			// 🔎 Detectar si es una IP local de la maquina
 			NetworkInterface ni = NetworkInterface.getByInetAddress(address);
 
 			if (ni != null) {

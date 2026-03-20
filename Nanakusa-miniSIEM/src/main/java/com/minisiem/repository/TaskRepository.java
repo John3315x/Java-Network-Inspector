@@ -5,7 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.minisiem.TaskIDs;
 import com.minisiem.database.DatabaseConnection;
 import com.minisiem.model.Task;
 
@@ -38,7 +42,7 @@ public class TaskRepository implements Controller {
 			}
 
 		} catch (SQLException e) {
-			System.out.println("Repository error- " + e.getMessage());
+			System.out.println("Repository error- [Task] " + e.getMessage());
 		}
 
 		return id;
@@ -59,6 +63,50 @@ public class TaskRepository implements Controller {
 	public void destroy(int id) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<Object> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Object> getItems(String param1, int param2) {
+		String sql = "SELECT * FROM task WHERE " + param1 + " = ?";
+		List<Object> list = new ArrayList<Object>();
+
+		try (Connection conn = DatabaseConnection.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+			
+			stmt.setInt(1, param2);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				Task task = new Task();
+				
+				task.setId(rs.getInt("id"));
+				task.setCode(rs.getString("code"));
+				task.setType(TaskIDs.valueOf(rs.getString("type")));
+				task.setDescription(rs.getString("description"));
+				task.setStatus(TaskIDs.valueOf(rs.getString("status")));
+				task.setDateTime(rs.getObject("task_date", LocalDateTime.class));
+				
+				list.add(task);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Repository error- [Port] " + e.getMessage());
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<Object> getItems(String param1, String param2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

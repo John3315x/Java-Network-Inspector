@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.minisiem.database.DatabaseConnection;
 import com.minisiem.model.Event;
@@ -28,7 +29,7 @@ public class EventRepository implements Controller {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
-			System.out.println("Repository error- " + e.getMessage());
+			System.out.println("Repository error- [Evenet] " + e.getMessage());
 		}
 	}
 
@@ -42,6 +43,24 @@ public class EventRepository implements Controller {
 	public void destroy(int id) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<Object> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Object> getItems(String param1, int param2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Object> getItems(String param1, String param2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

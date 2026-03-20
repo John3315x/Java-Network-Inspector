@@ -55,11 +55,11 @@ public class LocalPortScanner {
 			Callable<Port> task = () -> {
 
 				if (portScanner.isTcpPortOpen(ip, currentPort)) {
-					return new TcpPort(ip, currentPort + "", "TCP", serviceDetector.detectTcpService(ip, currentPort));
+					return new TcpPort(task_id, ip, currentPort + "", "TCP", serviceDetector.detectTcpService(ip, currentPort));
 				} 
 				
 				if (portScanner.isUdpPortOpen(ip, currentPort)) {
-					return new UdpPort(ip, currentPort + "", "UDP", serviceDetector.detectUdpService(currentPort));
+					return new UdpPort(task_id, ip, currentPort + "", "UDP", serviceDetector.detectUdpService(currentPort));
 				}
 
 				return null;
