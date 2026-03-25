@@ -140,4 +140,45 @@ public class DeviceRepository implements Controller {
 
 		return devices;
 	}
+
+	@Override
+	public List<Object> getItems(int volume, String order) {
+		List<Object> devices = new ArrayList<Object>();
+		String sql = "";
+		
+		if(order.equals("-")) {
+			sql = "SELECT * FROM devices ORDER BY created_at  DESC LIMIT ?";
+			
+		}else if (order.equals("--")) {
+			sql = "SELECT * FROM devices ORDER BY created_at  ASC LIMIT ?";
+			
+		}else {
+			
+		}
+		
+		try (Connection conn = DatabaseConnection.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, volume);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+
+				Device device = new Device();
+
+				device.setId(rs.getInt("id"));
+				device.setIp(rs.getString("ip_address"));
+				device.setHostname(rs.getString("hostname"));
+				device.setMac(rs.getString("mac_address"));
+
+				device.setSeenFirstTime(rs.getObject("seen_first_time", LocalDateTime.class));
+
+				devices.add(device);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Repository error- [Device] " + e.getMessage());
+		}
+		return devices;
+	}
 }

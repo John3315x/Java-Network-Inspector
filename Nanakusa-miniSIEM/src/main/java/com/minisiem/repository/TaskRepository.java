@@ -109,4 +109,10 @@ public class TaskRepository implements Controller {
 		return null;
 	}
 
+	@Override
+	public List<Object> getItems(int volume, String order) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

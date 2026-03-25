@@ -103,6 +103,15 @@ public class Main {
 		 * "10.171.170.41"); for (Object object : list) { Device device = (Device)
 		 * object; System.out.println(device.dbFormat()); }
 		 */
+
+		/**
+		 * Obtener x cantidad de devices en  orden DESC(-) o ASC(--)
+		 */
+		/*
+		 * List<Object> list = new DeviceRepository().getItems(3, "--"); for (Object
+		 * object : list) { Device device = (Device) object;
+		 * System.out.println(device.dbFormat()); }
+		 */
 	}
 
 }

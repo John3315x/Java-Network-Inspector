@@ -36,7 +36,7 @@ public class LocalPortScanner {
 	 *         Future. Eso funciona, pero consume memoria.Mejor usar
 	 *         CompletionService.
 	 */
-	public List<Port> scanAllPorts(String ip) {
+	public List<Port> scanAllPorts(String ip, int numberPorts) {
 		// Se crea una INDICACION de tarea en el miniSEAM
 		Task taskIndicator = new Task(TaskIDs.SUBTASK, "Local port detection");
 		int task_id = TaskManager.subTaskStartedAndGetId(taskIndicator);
@@ -48,7 +48,7 @@ public class LocalPortScanner {
 
 		ServiceDetector serviceDetector = new ServiceDetector();
 
-		for (int port = 1; port <= 65535; port++) {
+		for (int port = 1; port <= numberPorts; port++) {
 
 			final int currentPort = port;
 

@@ -114,7 +114,6 @@ public class Device {
 	}
 
 	public String dbFormat() {
-		return "Device [id=" + id + ", ip=" + ip + ", hostname=" + hostname + ", mac=" + mac + ", openPorts="
-				+ openPorts + ", seenFirstTime=" + seenFirstTime + "]";
+		return "Device [id=" + id + ", ip=" + ip + ", hostname=" + hostname + ", mac=" + mac + ", seenFirstTime=" + seenFirstTime + "]";
 	}
 }
