@@ -48,7 +48,7 @@ public class CommandRouter {
 	}
 	
 	/**
-	 * sap $
+	 * sap $ #
 	 * @param ip
 	 * @return
 	 */
@@ -57,6 +57,10 @@ public class CommandRouter {
 		return localPortScanner.scanAllPorts(ip, numberPorts);
 	}
 	
+	/**
+	 * pfhs
+	 * @return
+	 */
 	public List<Device> performFullHostScan() {
 		List<Device> devices = new ArrayList<Device>();
 		try {

@@ -21,10 +21,12 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import com.minisiem.events.log.EventManager;
 import com.minisiem.model.Device;
 import com.minisiem.model.port.Port;
+import com.minisiem.monitor.NetworkMonitor;
 import com.minisiem.utils.Monitor.FrameMonitor;
-import com.minisiem.utils.Monitor.Monitor;
+import com.minisiem.utils.Monitor.NKMonitor;
 
 public class Console extends JPanel {
 
@@ -49,8 +51,11 @@ public class Console extends JPanel {
     
     // Monitor
     private FrameMonitor frameMonitor;
-    private Monitor nkMonitor;
-    private boolean activeNKMonitor;
+    private NKMonitor nkMonitor;
+    private boolean activeNKMonitor, monitoring;
+    
+    //Actividades de monitor
+    private NetworkMonitor networkMonitor;
 
 	public Console() {
 
@@ -59,8 +64,10 @@ public class Console extends JPanel {
 		this.locked = false;
 		this.commandRouter = new CommandRouter();
 		
-		this.nkMonitor = new Monitor();
+		this.nkMonitor = new NKMonitor();
 		this.activeNKMonitor = false;
+		this.monitoring = false;
+		networkMonitor = new NetworkMonitor();
 
 		console = new JTextArea();
 		console.setBackground(Color.BLACK);
@@ -143,6 +150,15 @@ public class Console extends JPanel {
 		
 		/**
 		 * Regex
+		 * device activity -m #, d a -m #
+		 */
+		Pattern patternA3 = Pattern.compile(
+				"(device\\s+activity|d\\s+a)\\s+(-m)\\s+(1[5-9]|[2-9]\\d|[1-2]\\d{2}|300)"
+		);
+		Matcher matcherA3 = patternA3.matcher(cmd);
+		
+		/**
+		 * Regex
 		 * color # # #
 		 */
 		Pattern patternC1 = Pattern.compile(
@@ -183,8 +199,11 @@ public class Console extends JPanel {
 					+ "|host 0, h 0, host -#, host --#, h -#, h --#\n"
 					+ "|sap $ #\n"
 					+ "|pfhs\n"
-					+ "|nk monitor, nk m\n"
-					+ "|nk monitor close, nk m c\n"
+					+ "|nk -monitor, nk -m\n"
+					+ "|nk -monitor close, nk -m c\n"
+					+ "|device activity -m #, d a -m # (# >= 15 o # <= 300)\n"
+					+ "|device activity -m stop, d a -m s\n"
+					+ "|-monitor clear, -monitor cls, -m clear, -m cls\n"
 					+ "---------------------------------\n"
 					+ "|color # # #, c # # #\n"
 					+ "|color reset, color r, c r"
@@ -323,17 +342,66 @@ public class Console extends JPanel {
 			}).start();
 		}
 		
-		else if ((cmd.equals("nk monitor") || cmd.equals("nk m")) && consoleMode == 2) {// nk monitor, nk m
+		else if ((cmd.equals("nk -monitor") || cmd.equals("nk -m")) && consoleMode == 2) {// nk monitor, nk m
 			if (!activeNKMonitor) {
 				frameMonitor = new FrameMonitor(1200, 700, nkMonitor);
 				activeNKMonitor = true;
+				
+				nkMonitor.loadingAnimationNKMonitor().start();
 			}
 		}
 		
-		else if ((cmd.equals("nk monitor close") || cmd.equals("nk m c")) && consoleMode == 2) {// nk monitor close, nk m c
+		else if ((cmd.equals("nk -monitor close") || cmd.equals("nk -m c")) && consoleMode == 2) {// nk monitor close, nk m c
 			if (activeNKMonitor) {
 				frameMonitor.dispose();
 				activeNKMonitor = false;
+				
+				//detener monitoreo de red
+				networkMonitor.stop();
+				EventManager.monitor = null;// Para que deje de pintar en el NK Monitor si está activo
+				
+				nkMonitor.area.setText("");
+			}
+		}
+		
+		
+		//START MONITOR ACTIVITIES ====================
+		else if (matcherA3.matches()) {// device activity -m #, d a -m #
+			if (activeNKMonitor) {// Verificar que el nk monitor esté iniciado
+				nkMonitor.area.setText("");//Limpiar area
+				
+				//String comando = matcherA3.group(1); // device activity | d a
+			    //String flag = matcherA3.group(2);    // -m
+			    int segundos = Integer.parseInt(matcherA3.group(3));
+			    
+			    monitoring = true;//indicador de monitore activo
+			    console.append("\nSe ha iniciado un monitoreo de eventos de red para cada " + segundos + " segundos.");
+			    
+			    //Se inicia el hilo 
+				networkMonitor.start(segundos);
+				
+				//Se autoriza al Event Manager a pintar en NK Monitor al pasarle el objeto listo
+				EventManager.monitor = nkMonitor;
+			    
+			} else {
+				console.append("\nPara hacer uso de esta función es necesario iniciar una instancia de NK Monitor.");
+			}
+		}
+		
+		else if ((cmd.equals("-monitor clear") || cmd.equals("-monitor cls") || cmd.equals("-m clear") || cmd.equals("-m cls")) && consoleMode == 2) {
+			if(!monitoring)nkMonitor.area.setText("");
+		}
+		
+		//STOP MONITOR ACTIVITIES ====================
+		else if ((cmd.equals("device activity -m stop") || cmd.equals("d a -m s")) && consoleMode == 2) {// nk monitor close, nk m c
+			if (activeNKMonitor) {
+				
+				monitoring = false;//indicador de monitore activo
+				console.append("\nMonitoreo de eventos de red detenido.");
+				
+				//detener monitoreo de red
+				networkMonitor.stop();
+				EventManager.monitor = null;// Para que deje de pintar en el NK Monitor si está activo
 			}
 		}
 		
